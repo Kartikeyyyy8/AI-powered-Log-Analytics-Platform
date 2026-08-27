@@ -1,0 +1,503 @@
+{
+  "dataset": {
+    "file_name": "HealthApp.log",
+    "file_size_bytes": 23529930,
+    "file_size_mb": 22.44,
+    "path": "/Users/namansehwag/Downloads/HealthApp.log",
+    "profiled_at": "2026-08-26T13:32:45.842490Z"
+  },
+  "format": {
+    "expected_shape": "timestamp|component|process_id|message",
+    "field_count_distribution": {
+      "4": 253375,
+      "7": 20
+    },
+    "line_ending_distribution": {
+      "CRLF": 253395
+    },
+    "parser_note": "Split only the first three pipe separators; the message may contain pipes."
+  },
+  "quality_flags": {
+    "contains_control_character": 1,
+    "contains_null_byte": 1,
+    "message_contains_pipe_separator": 20,
+    "timestamp_parse_failed": 1
+  },
+  "recommendations": [
+    "Use streaming ingestion because the dataset is large enough to avoid full-file reads.",
+    "Implement a dedicated HealthApp parser that splits each line with maxsplit=3.",
+    "Clean null bytes and control characters before parsing or validation.",
+    "Normalize the custom timestamp format into ISO 8601 while preserving the original timestamp.",
+    "Generate message_type and extracted_metrics fields for ML anomaly detection.",
+    "Route blank, too-short, or unparseable records to dead-letter output with reason codes."
+  ],
+  "record_counts": {
+    "blank_lines": 0,
+    "clean_candidate_records": 253374,
+    "control_character_lines": 1,
+    "extra_separator_records": 20,
+    "null_byte_lines": 1,
+    "records_with_quality_flags": 21,
+    "replacement_character_lines": 0,
+    "too_few_field_records": 0,
+    "total_lines": 253395,
+    "valid_format_records": 253395
+  },
+  "sample_malformed_lines": [],
+  "sample_quality_issue_lines": [
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 1794,
+      "raw": "20171224-0:0:0:234|Step_StandStepDataManager|30002312|tryToReloadTodayBasicSteps1514044800223|3786|0|0"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 8472,
+      "raw": "20171224-15:32:58:368|Step_StandStepDataManager|30002312|tryToReloadTodayBasicSteps1514100778366|0|5017|0"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 17280,
+      "raw": "20171224-18:53:44:367|Step_HGNH|30002312|upDateHealthNotification()|214|7.14|10000"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 37868,
+      "raw": "20171225-0:0:0:367|Step_StandStepDataManager|30002312|tryToReloadTodayBasicSteps1514131200330|11903|0|0"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 53628,
+      "raw": "20171225-21:2:31:669|Step_HGNH|30002312|upDateHealthNotification()|276|7.22|10109"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 66532,
+      "raw": "20171226-0:0:0:268|Step_StandStepDataManager|30002312|tryToReloadTodayBasicSteps1514217600236|26302|0|0"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 66979,
+      "raw": "20171226-8:0:4:141|Step_StandStepDataManager|30002312|tryToReloadTodayBasicSteps1514246404138|0|29|0"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 87622,
+      "raw": "20171227-0:0:0:214|Step_StandStepDataManager|30002312|tryToReloadTodayBasicSteps1514304000166|5485|0|0"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 102000,
+      "raw": "20171228-0:0:2:239|Step_StandStepDataManager|30002312|tryToReloadTodayBasicSteps1514390402206|12910|0|0"
+    },
+    {
+      "flags": [
+        "message_contains_pipe_separator"
+      ],
+      "line_number": 116461,
+      "raw": "20171229-0:0:1:233|Step_StandStepDataManager|30002312|tryToReloadTodayBasicSteps1514476801203|18999|0|0"
+    }
+  ],
+  "timestamps": {
+    "first_normalized_timestamp": "2017-12-23T22:15:29.606000Z",
+    "first_timestamp": "20171223-22:15:29:606",
+    "format": "YYYYMMDD-H:m:s:SSS or compact variants such as YYYYMD-H:m:s:S",
+    "last_normalized_timestamp": "2018-01-03T09:59:00.950000Z",
+    "last_timestamp": "201813-9:59:0:95",
+    "parseable_timestamps": 253394,
+    "timestamp_issue_counts": {
+      "timestamp_format_mismatch": 1
+    },
+    "timestamp_parse_failures": 1
+  },
+  "top_components": [
+    {
+      "count": 81216,
+      "value": "Step_LSC"
+    },
+    {
+      "count": 56057,
+      "value": "Step_SPUtils"
+    },
+    {
+      "count": 54857,
+      "value": "Step_ExtSDM"
+    },
+    {
+      "count": 26815,
+      "value": "Step_StandReportReceiver"
+    },
+    {
+      "count": 7694,
+      "value": "HiH_HiSyncControl"
+    },
+    {
+      "count": 7237,
+      "value": "HiH_DataStatManager"
+    },
+    {
+      "count": 3456,
+      "value": "HiH_HiHealthBinder"
+    },
+    {
+      "count": 3385,
+      "value": "HiH_HiHealthDataInsertStore"
+    },
+    {
+      "count": 3231,
+      "value": "Step_FlushableStepDataCache"
+    },
+    {
+      "count": 3156,
+      "value": "HiH_HiAppUtil"
+    },
+    {
+      "count": 1644,
+      "value": "Step_StandStepCounter"
+    },
+    {
+      "count": 1584,
+      "value": "HiH_"
+    },
+    {
+      "count": 792,
+      "value": "HiH_HiBroadcastUtil"
+    },
+    {
+      "count": 744,
+      "value": "HiH_ListenerManager"
+    },
+    {
+      "count": 716,
+      "value": "HiH_HiSyncUtil"
+    },
+    {
+      "count": 227,
+      "value": "Step_ScreenUtil"
+    },
+    {
+      "count": 195,
+      "value": "Step_ReportController"
+    },
+    {
+      "count": 95,
+      "value": "Step_StandStepDataManager"
+    },
+    {
+      "count": 75,
+      "value": "Step_CounterSupport"
+    },
+    {
+      "count": 50,
+      "value": "Step_MidwareStepCounter"
+    },
+    {
+      "count": 47,
+      "value": "Step_HGNH"
+    },
+    {
+      "count": 20,
+      "value": "Step_NotificationUtil"
+    },
+    {
+      "count": 18,
+      "value": "Step_OneMinuteStepData"
+    },
+    {
+      "count": 14,
+      "value": "Step_CfgFilePolicy"
+    },
+    {
+      "count": 11,
+      "value": "Step_DataCache"
+    },
+    {
+      "count": 10,
+      "value": "Step_StepCounterManager"
+    },
+    {
+      "count": 10,
+      "value": "HiH_HiHealthService"
+    },
+    {
+      "count": 7,
+      "value": "HiH_HiDataClientStore"
+    },
+    {
+      "count": 6,
+      "value": "Step_DaemonService"
+    },
+    {
+      "count": 5,
+      "value": "Step_StaticReceiver"
+    }
+  ],
+  "top_message_patterns": [
+    {
+      "count": 39753,
+      "value": "onExtend:<num> <num> <num> <num>"
+    },
+    {
+      "count": 30161,
+      "value": "onStandStepChanged <num>"
+    },
+    {
+      "count": 27447,
+      "value": "getTodayTotalDetailSteps = <num>##<num>##<num>##<num>##<num>##<num>"
+    },
+    {
+      "count": 27431,
+      "value": "setTodayTotalDetailSteps=<num>##<num>##<num>##<num>##<num>##<num>"
+    },
+    {
+      "count": 27426,
+      "value": "calculateCaloriesWithCache totalCalories=<num>"
+    },
+    {
+      "count": 27426,
+      "value": "calculateAltitudeWithCache totalAltitude=<num>"
+    },
+    {
+      "count": 23539,
+      "value": "REPORT : <num> <num> <num> <num>"
+    },
+    {
+      "count": 7064,
+      "value": "new date =<num>, type=<num>,<num>,old=<num>"
+    },
+    {
+      "count": 6975,
+      "value": "processHandleBroadcastAction action:android.intent.action.TIME_TICK"
+    },
+    {
+      "count": 3156,
+      "value": "getBinderPackageName packageName = com.huawei.health"
+    },
+    {
+      "count": 1920,
+      "value": "upLoadOneMinuteDataToEngine time=<num>,<num>,<num>,<num>,<num>"
+    },
+    {
+      "count": 1617,
+      "value": "onReceive action: android.intent.action.SCREEN_ON"
+    },
+    {
+      "count": 1617,
+      "value": "processHandleBroadcastAction action:android.intent.action.SCREEN_ON"
+    },
+    {
+      "count": 1617,
+      "value": "flush sensor data"
+    },
+    {
+      "count": 1617,
+      "value": "onReceive action: android.intent.action.SCREEN_OFF"
+    },
+    {
+      "count": 1172,
+      "value": "saveStatData() type =<num>,time = <num>,statClient = <num>,who is <num>"
+    },
+    {
+      "count": 792,
+      "value": "startSync hiSyncOption = HiSyncOption{syncAction=<num>, syncMethod=<num>, syncScope=<num>, syncDataType=<num>, syncModel=<num>, pushAction=<num>},app = <num> wh"
+    },
+    {
+      "count": 792,
+      "value": "needAutoSync autoSyncSwitch is open"
+    },
+    {
+      "count": 792,
+      "value": "initDataPrivacy the dataPrivacy switch is open, start push health data!"
+    },
+    {
+      "count": 792,
+      "value": "initDataPrivacy the dataPrivacy is true"
+    },
+    {
+      "count": 792,
+      "value": "initUserPrivacy the userPrivacy switch is open, start push user data!"
+    },
+    {
+      "count": 792,
+      "value": "initUserPrivacy the userPrivacy is true"
+    },
+    {
+      "count": 792,
+      "value": "ifCanSync not! no cloud version"
+    },
+    {
+      "count": 792,
+      "value": "sendSyncFailedBroadcast"
+    },
+    {
+      "count": 744,
+      "value": "getAppContext() isAppValid health or wear, packageName = com.huawei.health"
+    },
+    {
+      "count": 744,
+      "value": "insertHiHealthData() checkAppType <num> appID = <num>"
+    },
+    {
+      "count": 744,
+      "value": "insertHiHealthData() size = <num>,app = <num>,One Data Type = <num>,packageName = com.huawei.health,writeStatType = <num>"
+    },
+    {
+      "count": 744,
+      "value": "saveHealthDetailData() deviceID = <num>,clientID=<num>,id=<num>"
+    },
+    {
+      "count": 744,
+      "value": "bulkSaveDetailHiHealthData() size = <num>,totalTime = <num>"
+    },
+    {
+      "count": 744,
+      "value": "startListenerChange subscribeList = [<num>]"
+    }
+  ],
+  "top_message_types": [
+    {
+      "count": 39753,
+      "value": "onExtend"
+    },
+    {
+      "count": 30161,
+      "value": "onStandStepChanged"
+    },
+    {
+      "count": 27447,
+      "value": "getTodayTotalDetailSteps"
+    },
+    {
+      "count": 27431,
+      "value": "setTodayTotalDetailSteps"
+    },
+    {
+      "count": 27426,
+      "value": "calculateCaloriesWithCache"
+    },
+    {
+      "count": 27426,
+      "value": "calculateAltitudeWithCache"
+    },
+    {
+      "count": 23539,
+      "value": "REPORT"
+    },
+    {
+      "count": 7237,
+      "value": "new"
+    },
+    {
+      "count": 6975,
+      "value": "TIME_TICK"
+    },
+    {
+      "count": 3234,
+      "value": "SCREEN_ON"
+    },
+    {
+      "count": 3156,
+      "value": "getBinderPackageName"
+    },
+    {
+      "count": 2444,
+      "value": "insertHiHealthData"
+    },
+    {
+      "count": 1920,
+      "value": "upLoadOneMinuteDataToEngine"
+    },
+    {
+      "count": 1802,
+      "value": "SCREEN_OFF"
+    },
+    {
+      "count": 1617,
+      "value": "flush"
+    },
+    {
+      "count": 1584,
+      "value": "initDataPrivacy"
+    },
+    {
+      "count": 1584,
+      "value": "initUserPrivacy"
+    },
+    {
+      "count": 1410,
+      "value": "startInsertSportSync"
+    },
+    {
+      "count": 1390,
+      "value": "checkInsertStatus"
+    },
+    {
+      "count": 1172,
+      "value": "saveStatData"
+    },
+    {
+      "count": 1032,
+      "value": "saveHealthDetailData"
+    },
+    {
+      "count": 872,
+      "value": "setWriteDBLastDataMinute"
+    },
+    {
+      "count": 792,
+      "value": "stepSyncOrNot"
+    },
+    {
+      "count": 792,
+      "value": "startSync"
+    },
+    {
+      "count": 792,
+      "value": "needAutoSync"
+    },
+    {
+      "count": 792,
+      "value": "ifCanSync"
+    },
+    {
+      "count": 792,
+      "value": "sendSyncFailedBroadcast"
+    },
+    {
+      "count": 744,
+      "value": "getAppContext"
+    },
+    {
+      "count": 744,
+      "value": "bulkSaveDetailHiHealthData"
+    },
+    {
+      "count": 744,
+      "value": "startListenerChange"
+    }
+  ],
+  "top_process_ids": [
+    {
+      "count": 253395,
+      "value": "30002312"
+    }
+  ]
+}
