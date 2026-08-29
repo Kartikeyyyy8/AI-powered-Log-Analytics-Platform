@@ -1,4 +1,4 @@
-"""Log processing and data quality package for the AI log analytics project."""
+"""Pipeline orchestration service package."""
 
 from LogProcessing.services.pipeline import ProcessingResult, process_logs
 

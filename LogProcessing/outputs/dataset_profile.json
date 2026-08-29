@@ -4,7 +4,7 @@
     "file_size_bytes": 23529930,
     "file_size_mb": 22.44,
     "path": "/Users/namansehwag/Downloads/HealthApp.log",
-    "profiled_at": "2026-08-26T13:32:45.842490Z"
+    "profiled_at": "2026-08-29T05:07:44.912383Z"
   },
   "format": {
     "expected_shape": "timestamp|component|process_id|message",
@@ -228,26 +228,6 @@
     {
       "count": 11,
       "value": "Step_DataCache"
-    },
-    {
-      "count": 10,
-      "value": "Step_StepCounterManager"
-    },
-    {
-      "count": 10,
-      "value": "HiH_HiHealthService"
-    },
-    {
-      "count": 7,
-      "value": "HiH_HiDataClientStore"
-    },
-    {
-      "count": 6,
-      "value": "Step_DaemonService"
-    },
-    {
-      "count": 5,
-      "value": "Step_StaticReceiver"
     }
   ],
   "top_message_patterns": [
@@ -350,26 +330,6 @@
     {
       "count": 744,
       "value": "getAppContext() isAppValid health or wear, packageName = com.huawei.health"
-    },
-    {
-      "count": 744,
-      "value": "insertHiHealthData() checkAppType <num> appID = <num>"
-    },
-    {
-      "count": 744,
-      "value": "insertHiHealthData() size = <num>,app = <num>,One Data Type = <num>,packageName = com.huawei.health,writeStatType = <num>"
-    },
-    {
-      "count": 744,
-      "value": "saveHealthDetailData() deviceID = <num>,clientID=<num>,id=<num>"
-    },
-    {
-      "count": 744,
-      "value": "bulkSaveDetailHiHealthData() size = <num>,totalTime = <num>"
-    },
-    {
-      "count": 744,
-      "value": "startListenerChange subscribeList = [<num>]"
     }
   ],
   "top_message_types": [
@@ -472,26 +432,6 @@
     {
       "count": 792,
       "value": "needAutoSync"
-    },
-    {
-      "count": 792,
-      "value": "ifCanSync"
-    },
-    {
-      "count": 792,
-      "value": "sendSyncFailedBroadcast"
-    },
-    {
-      "count": 744,
-      "value": "getAppContext"
-    },
-    {
-      "count": 744,
-      "value": "bulkSaveDetailHiHealthData"
-    },
-    {
-      "count": 744,
-      "value": "startListenerChange"
     }
   ],
   "top_process_ids": [
