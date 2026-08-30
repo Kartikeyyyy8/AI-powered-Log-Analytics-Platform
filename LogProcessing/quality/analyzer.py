@@ -24,12 +24,8 @@ class QualityAnalyzer:
 
         for flag in record.quality_flags:
             self.metrics.quality_flag_counts[flag] += 1
-            if flag == "timestamp_parse_failed":
-                self.metrics.timestamp_parse_failures += 1
-            elif flag == "message_contains_pipe_separator":
+            if flag == "message_contains_pipe_separator":
                 self.metrics.extra_separator_records += 1
-            elif flag in ("contains_null_byte", "cleaned_null_bytes"):
-                self.metrics.corrupted_lines += 1
 
     def record_dead_letter(self, dead_letter: DeadLetterLogRecord) -> None:
         """Update metrics for an unparseable or rejected record."""
@@ -41,11 +37,19 @@ class QualityAnalyzer:
             self.metrics.blank_lines += 1
         if "null" in reason or "corrupt" in reason or "malformed" in reason:
             self.metrics.corrupted_lines += 1
+        if "timestamp" in reason or "unparseable_timestamp" in reason:
+            self.metrics.timestamp_parse_failures += 1
         if "missing" in reason:
             self.metrics.missing_field_counts[dead_letter.error_reason] += 1
 
         for flag in dead_letter.quality_flags:
             self.metrics.quality_flag_counts[flag] += 1
+            if flag == "timestamp_parse_failed" and "timestamp" not in reason:
+                self.metrics.timestamp_parse_failures += 1
+            elif flag == "contains_null_byte" and "null" not in reason and "corrupt" not in reason:
+                self.metrics.corrupted_lines += 1
+            elif flag == "message_contains_pipe_separator":
+                self.metrics.extra_separator_records += 1
 
     def generate_report(self, total_lines: int | None = None) -> QualityReport:
         """Compile accumulated metrics into a structured QualityReport."""

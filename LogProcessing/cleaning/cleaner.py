@@ -25,6 +25,7 @@ class LogCleaner:
 
         if "\x00" in cleaned:
             cleaned = cleaned.replace("\x00", "")
+            flags.append("contains_null_byte")
             flags.append("cleaned_null_bytes")
 
         if CONTROL_CHARACTERS_REGEX.search(cleaned):
@@ -42,6 +43,7 @@ class LogCleaner:
         """Clean all text fields in a parsed log record.
 
         Original raw_message and source metadata are preserved unmodified.
+        Quality flags indicating corruption or cleaning operations are retained.
         """
         all_flags = list(record.quality_flags)
 

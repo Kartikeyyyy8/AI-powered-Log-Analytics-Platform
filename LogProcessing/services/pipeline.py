@@ -5,11 +5,12 @@ from __future__ import annotations
 import argparse
 import sys
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 
 from LogProcessing.cleaning.cleaner import LogCleaner
 from LogProcessing.config.settings import DEFAULT_SETTINGS
-from LogProcessing.exceptions.errors import ParsingError, ValidationError
+from LogProcessing.exceptions.errors import ParsingError
 from LogProcessing.ingestion.file_ingestor import FileIngestor
 from LogProcessing.normalization.normalizer import LogNormalizer
 from LogProcessing.parsing.healthapp_parser import HealthAppParser
@@ -65,6 +66,8 @@ def process_logs(
         else None
     )
 
+    run_ingestion_timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+
     ingestor = FileIngestor()
     parser = HealthAppParser()
     validator = LogValidator()
@@ -75,13 +78,13 @@ def process_logs(
     with JsonLinesWriter(processed_logs_path) as processed_writer, DeadLetterWriter(
         dead_letter_logs_path
     ) as dead_letter_writer:
-        for raw_record in ingestor.ingest_file(input_file):
+        for raw_record in ingestor.ingest_file(input_file, ingestion_timestamp=run_ingestion_timestamp):
             total_lines += 1
 
             # 1. Parsing
             try:
                 parsed_record = parser.parse(raw_record)
-            except (ParsingError, Exception) as exc:
+            except ParsingError as exc:
                 dead_letter = DeadLetterLogRecord(
                     source=raw_record.source_name,
                     line_number=raw_record.line_number,
@@ -95,13 +98,13 @@ def process_logs(
                 analyzer.record_dead_letter(dead_letter)
                 continue
 
-            # 2. Cleaning
+            # 2. Cleaning (safe normalization while retaining corruption quality flags)
             cleaned_record = LogCleaner.clean_record(parsed_record)
 
             # 3. Normalization & Classification
             structured_record = LogNormalizer.normalize(cleaned_record)
 
-            # 4. Validation
+            # 4. Validation (enforces required fields, types, and corruption rejection)
             is_valid, validation_errors = validator.validate(structured_record)
             if not is_valid:
                 dead_letter = DeadLetterLogRecord(

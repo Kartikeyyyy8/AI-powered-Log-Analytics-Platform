@@ -1,7 +1,7 @@
 """Profile raw log datasets before building the processing pipeline.
 
-The profiler is intentionally dependency-free so Phase 1 can run in a clean
-repository and produce an evidence-based dataset profile.
+The profiler uses the shared LogNormalizer for timestamp normalization
+guaranteeing a single source of truth across profiling and pipeline execution.
 """
 
 from __future__ import annotations
@@ -10,25 +10,14 @@ import argparse
 import json
 import re
 from collections import Counter
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+from LogProcessing.normalization.normalizer import LogNormalizer, ParsedTimestamp
 
-TIMESTAMP_PATTERN = re.compile(
-    r"^(?P<date>\d{6,8})-(?P<hour>\d{1,2}):(?P<minute>\d{1,2}):"
-    r"(?P<second>\d{1,2}):(?P<millisecond>\d{1,3})$"
-)
 CONTROL_CHARACTER_PATTERN = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
 NUMBER_PATTERN = re.compile(r"\d+(?:\.\d+)?")
-
-
-@dataclass(frozen=True)
-class ParsedTimestamp:
-    original: str
-    normalized: str | None
-    issue: str | None
 
 
 def _decode_line(raw_line: bytes) -> str:
@@ -46,43 +35,7 @@ def _line_ending(raw_line: bytes) -> str:
 
 
 def _parse_healthapp_timestamp(value: str) -> ParsedTimestamp:
-    match = TIMESTAMP_PATTERN.match(value)
-    if not match:
-        return ParsedTimestamp(value, None, "timestamp_format_mismatch")
-
-    date_value = match.group("date")
-    if len(date_value) == 8:
-        year = int(date_value[:4])
-        month = int(date_value[4:6])
-        day = int(date_value[6:8])
-    elif len(date_value) == 6:
-        year = int(date_value[:4])
-        month = int(date_value[4])
-        day = int(date_value[5])
-    else:
-        return ParsedTimestamp(value, None, "unsupported_date_length")
-
-    hour = int(match.group("hour"))
-    minute = int(match.group("minute"))
-    second = int(match.group("second"))
-    millisecond = int(match.group("millisecond").ljust(3, "0"))
-
-    try:
-        parsed = datetime(
-            year,
-            month,
-            day,
-            hour,
-            minute,
-            second,
-            millisecond * 1000,
-            tzinfo=timezone.utc,
-        )
-    except ValueError as exc:
-        return ParsedTimestamp(value, None, f"invalid_datetime: {exc}")
-
-    normalized = parsed.isoformat().replace("+00:00", "Z")
-    return ParsedTimestamp(value, normalized, None)
+    return LogNormalizer.parse_timestamp(value)
 
 
 def _message_type(message: str) -> str:
@@ -299,10 +252,10 @@ def profile_dataset(input_path: str | Path, top_limit: int = 25) -> dict[str, An
         "recommendations": [
             "Use streaming ingestion because the dataset is large enough to avoid full-file reads.",
             "Implement a dedicated HealthApp parser that splits each line with maxsplit=3.",
-            "Clean null bytes and control characters before parsing or validation.",
-            "Normalize the custom timestamp format into ISO 8601 while preserving the original timestamp.",
+            "Route corrupted records (e.g. null bytes in structural fields) to dead-letter output.",
+            "Normalize custom timestamp formats into ISO 8601 UTC with single-source-of-truth semantics.",
             "Generate message_type and extracted_metrics fields for ML anomaly detection.",
-            "Route blank, too-short, or unparseable records to dead-letter output with reason codes.",
+            "Preserve exact raw lines for all records and dead letters for auditing.",
         ],
     }
 

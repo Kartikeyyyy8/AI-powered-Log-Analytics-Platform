@@ -31,7 +31,7 @@ class HealthAppParser(BaseParser):
         raw_text = raw_record.raw_message
         quality_flags: list[str] = []
 
-        # Check metadata from ingestion or scan raw message
+        # Track byte-level and text-level corruption flags
         if raw_record.metadata.get("contains_null_byte") or "\x00" in raw_text:
             quality_flags.append("contains_null_byte")
 
@@ -41,8 +41,9 @@ class HealthAppParser(BaseParser):
         if CONTROL_CHARACTER_PATTERN.search(raw_text):
             quality_flags.append("contains_control_character")
 
-        cleaned_text = raw_text.replace("\x00", "").strip()
-        if not cleaned_text:
+        # Check for empty / whitespace-only / null-only lines
+        cleaned_for_blank_check = raw_text.replace("\x00", "").strip()
+        if not cleaned_for_blank_check:
             raise BlankRecordError(f"Line {raw_record.line_number} is blank or null-only.")
 
         parts = raw_text.split("|", 3)
@@ -59,19 +60,19 @@ class HealthAppParser(BaseParser):
         timestamp, component, process_id, message = parts
 
         # Check for missing/empty required fields
-        if not timestamp.strip():
+        if not timestamp.replace("\x00", "").strip():
             quality_flags.append("missing_timestamp")
             raise MissingFieldError(f"Line {raw_record.line_number} missing timestamp.")
 
-        if not component.strip():
+        if not component.replace("\x00", "").strip():
             quality_flags.append("missing_component")
             raise MissingFieldError(f"Line {raw_record.line_number} missing component.")
 
-        if not process_id.strip():
+        if not process_id.replace("\x00", "").strip():
             quality_flags.append("missing_process_id")
             raise MissingFieldError(f"Line {raw_record.line_number} missing process_id.")
 
-        if not message.strip():
+        if not message.replace("\x00", "").strip():
             quality_flags.append("missing_message")
             raise MissingFieldError(f"Line {raw_record.line_number} missing message.")
 

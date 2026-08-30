@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import re
+from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -17,23 +18,37 @@ TIMESTAMP_PATTERN = re.compile(
 )
 
 
+@dataclass(frozen=True)
+class ParsedTimestamp:
+    """Represents the parsed and normalized state of a timestamp."""
+
+    original: str
+    normalized: str | None
+    issue: str | None
+
+
 class LogNormalizer:
     """Normalizes parsed and cleaned log records into canonical structured records."""
 
     @classmethod
-    def parse_timestamp(cls, raw_timestamp: str) -> tuple[str | None, str | None]:
+    def parse_timestamp(cls, raw_timestamp: str) -> ParsedTimestamp:
         """Parse HealthApp custom timestamp string into ISO 8601 UTC format.
 
         Supports both:
           - 8-digit dates: YYYYMMDD (e.g., 20171223)
           - 6-digit compact dates: YYYYMD (e.g., 201812 -> 2018-01-02, 201813 -> 2018-01-03)
 
+        Correct Millisecond Semantics:
+          - Non-padded milliseconds are values in 0..999, e.g.
+            "95" -> 95ms (.095Z), "6" -> 6ms (.006Z), "606" -> 606ms (.606Z).
+
         Returns:
-            Tuple of (normalized_iso_timestamp_or_none, error_issue_or_none).
+            ParsedTimestamp with normalized ISO string or issue reason.
         """
-        match = TIMESTAMP_PATTERN.match(raw_timestamp.strip())
+        raw = raw_timestamp.strip()
+        match = TIMESTAMP_PATTERN.match(raw)
         if not match:
-            return None, "timestamp_format_mismatch"
+            return ParsedTimestamp(raw_timestamp, None, "timestamp_format_mismatch")
 
         date_value = match.group("date")
         if len(date_value) == 8:
@@ -45,15 +60,12 @@ class LogNormalizer:
             month = int(date_value[4])
             day = int(date_value[5])
         else:
-            return None, "unsupported_date_length"
+            return ParsedTimestamp(raw_timestamp, None, "unsupported_date_length")
 
         hour = int(match.group("hour"))
         minute = int(match.group("minute"))
         second = int(match.group("second"))
-        
-        # Right pad millisecond to 3 digits (e.g. '95' -> '950', '6' -> '600')
-        ms_str = match.group("millisecond").ljust(3, "0")
-        millisecond = int(ms_str)
+        millisecond = int(match.group("millisecond"))
 
         try:
             parsed = datetime(
@@ -67,14 +79,14 @@ class LogNormalizer:
                 tzinfo=timezone.utc,
             )
         except ValueError as exc:
-            return None, f"invalid_datetime: {exc}"
+            return ParsedTimestamp(raw_timestamp, None, f"invalid_datetime: {exc}")
 
         iso_formatted = (
             f"{parsed.year:04d}-{parsed.month:02d}-{parsed.day:02d}T"
             f"{parsed.hour:02d}:{parsed.minute:02d}:{parsed.second:02d}."
-            f"{int(parsed.microsecond / 1000):03d}Z"
+            f"{millisecond:03d}Z"
         )
-        return iso_formatted, None
+        return ParsedTimestamp(raw_timestamp, iso_formatted, None)
 
     @classmethod
     def generate_event_id(cls, source_name: str, line_number: int) -> str:
@@ -88,8 +100,9 @@ class LogNormalizer:
         """Transform a cleaned ParsedLogRecord into a canonical StructuredLogRecord."""
         flags = list(record.quality_flags)
 
-        normalized_ts, ts_issue = cls.parse_timestamp(record.timestamp)
-        if ts_issue is not None:
+        parsed_ts = cls.parse_timestamp(record.timestamp)
+        normalized_ts = parsed_ts.normalized
+        if parsed_ts.issue is not None:
             if "timestamp_parse_failed" not in flags:
                 flags.append("timestamp_parse_failed")
 

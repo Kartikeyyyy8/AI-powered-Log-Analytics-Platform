@@ -1,10 +1,10 @@
 {
   "total_lines": 253395,
   "processed_records": 253395,
-  "valid_records": 253395,
-  "invalid_records": 0,
+  "valid_records": 253394,
+  "invalid_records": 1,
   "blank_lines": 0,
-  "corrupted_lines": 2,
+  "corrupted_lines": 1,
   "timestamp_parse_failures": 0,
   "extra_separator_records": 20,
   "component_counts": {
@@ -29,7 +29,7 @@
     "Step_HGNH": 47,
     "Step_NotificationUtil": 20,
     "Step_ReportController": 195,
-    "Step_StaticReceiver": 5,
+    "Step_StaticReceiver": 4,
     "Step_UserInfo": 5,
     "Step_CounterSupport": 75,
     "Step_CfgFilePolicy": 14,
@@ -109,7 +109,7 @@
     "checkCurrentDay": 11,
     "getTodayNoSyncTotalValue": 11,
     "processHandleBroadcastAction": 10,
-    "BOOT_COMPLETED": 5,
+    "BOOT_COMPLETED": 4,
     "setDeviceShutDownValue": 10,
     "getFirstStartDaemonFromUI": 5,
     "getDeviceShutDownBoolean": 5,
@@ -197,7 +197,8 @@
     "message_contains_pipe_separator": 20,
     "contains_null_byte": 1,
     "contains_control_character": 1,
-    "cleaned_null_bytes": 1
+    "cleaned_null_bytes": 1,
+    "validation_failed": 1
   },
-  "generated_at": "2026-08-29T05:07:43.526129Z"
+  "generated_at": "2026-08-30T16:12:56.240790Z"
 }

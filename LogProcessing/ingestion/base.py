@@ -13,10 +13,13 @@ class BaseIngestor(ABC):
     """Common contract for current and future ingestion sources."""
 
     @abstractmethod
-    def ingest_file(self, input_path: str | Path) -> Iterable[RawLogRecord]:
+    def ingest_file(
+        self, input_path: str | Path, ingestion_timestamp: str | None = None
+    ) -> Iterable[RawLogRecord]:
         """Yield raw records from one input file."""
 
     @abstractmethod
-    def ingest_files(self, input_paths: Iterable[str | Path]) -> Iterable[RawLogRecord]:
+    def ingest_files(
+        self, input_paths: Iterable[str | Path], ingestion_timestamp: str | None = None
+    ) -> Iterable[RawLogRecord]:
         """Yield raw records from multiple input files."""
-

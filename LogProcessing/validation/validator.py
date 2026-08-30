@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from LogProcessing.schemas.structured_log import StructuredLogRecord
 from LogProcessing.validation.rules import (
+    check_corruption_policy,
     check_extracted_metrics,
     check_line_number,
     check_no_residual_control_characters,
@@ -18,6 +19,7 @@ class LogValidator:
         self.rules = [
             check_required_fields,
             check_line_number,
+            check_corruption_policy,
             check_extracted_metrics,
             check_no_residual_control_characters,
         ]

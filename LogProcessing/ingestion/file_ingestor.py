@@ -16,7 +16,6 @@ from LogProcessing.exceptions.errors import (
 from LogProcessing.ingestion.base import BaseIngestor
 from LogProcessing.schemas.raw_log import RawLogRecord
 
-
 DEFAULT_SUPPORTED_EXTENSIONS = frozenset({".log", ".txt", ".jsonl"})
 DEFAULT_MAX_FILE_SIZE_BYTES = 512 * 1024 * 1024
 
@@ -41,9 +40,12 @@ class FileIngestor(BaseIngestor):
         self.max_file_size_bytes = max_file_size_bytes
         self.encoding = encoding
 
-    def ingest_file(self, input_path: str | Path) -> Iterator[RawLogRecord]:
+    def ingest_file(
+        self, input_path: str | Path, ingestion_timestamp: str | None = None
+    ) -> Iterator[RawLogRecord]:
         path = Path(input_path)
         self._validate_file(path)
+        batch_ts = ingestion_timestamp or self._utc_now()
 
         with path.open("rb") as handle:
             for line_number, raw_line in enumerate(handle, start=1):
@@ -51,7 +53,7 @@ class FileIngestor(BaseIngestor):
                     source_path=path,
                     line_number=line_number,
                     raw_message=self._decode_line(raw_line),
-                    ingestion_timestamp=self._utc_now(),
+                    ingestion_timestamp=batch_ts,
                     byte_size=len(raw_line),
                     line_ending=self._line_ending(raw_line),
                     metadata={
@@ -60,9 +62,12 @@ class FileIngestor(BaseIngestor):
                     },
                 )
 
-    def ingest_files(self, input_paths: Iterable[str | Path]) -> Iterator[RawLogRecord]:
+    def ingest_files(
+        self, input_paths: Iterable[str | Path], ingestion_timestamp: str | None = None
+    ) -> Iterator[RawLogRecord]:
+        batch_ts = ingestion_timestamp or self._utc_now()
         for input_path in input_paths:
-            yield from self.ingest_file(input_path)
+            yield from self.ingest_file(input_path, ingestion_timestamp=batch_ts)
 
     def _validate_file(self, path: Path) -> None:
         if not path.exists():
@@ -100,4 +105,3 @@ class FileIngestor(BaseIngestor):
     @staticmethod
     def _utc_now() -> str:
         return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
-

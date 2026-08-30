@@ -49,6 +49,10 @@ class MissingFieldError(ParsingError):
     """Raised when a required field is missing from a parsed record."""
 
 
+class CorruptedRecordError(ParsingError):
+    """Raised when a log line contains unrecoverable corruption."""
+
+
 # Validation Errors
 class ValidationError(LogProcessingError):
     """Raised when a log record fails validation checks."""

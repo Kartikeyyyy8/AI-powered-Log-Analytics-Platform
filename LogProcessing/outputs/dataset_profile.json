@@ -4,7 +4,7 @@
     "file_size_bytes": 23529930,
     "file_size_mb": 22.44,
     "path": "/Users/namansehwag/Downloads/HealthApp.log",
-    "profiled_at": "2026-08-29T05:07:44.912383Z"
+    "profiled_at": "2026-08-30T16:12:57.666446Z"
   },
   "format": {
     "expected_shape": "timestamp|component|process_id|message",
@@ -26,10 +26,10 @@
   "recommendations": [
     "Use streaming ingestion because the dataset is large enough to avoid full-file reads.",
     "Implement a dedicated HealthApp parser that splits each line with maxsplit=3.",
-    "Clean null bytes and control characters before parsing or validation.",
-    "Normalize the custom timestamp format into ISO 8601 while preserving the original timestamp.",
+    "Route corrupted records (e.g. null bytes in structural fields) to dead-letter output.",
+    "Normalize custom timestamp formats into ISO 8601 UTC with single-source-of-truth semantics.",
     "Generate message_type and extracted_metrics fields for ML anomaly detection.",
-    "Route blank, too-short, or unparseable records to dead-letter output with reason codes."
+    "Preserve exact raw lines for all records and dead letters for auditing."
   ],
   "record_counts": {
     "blank_lines": 0,
@@ -117,10 +117,10 @@
     }
   ],
   "timestamps": {
-    "first_normalized_timestamp": "2017-12-23T22:15:29.606000Z",
+    "first_normalized_timestamp": "2017-12-23T22:15:29.606Z",
     "first_timestamp": "20171223-22:15:29:606",
     "format": "YYYYMMDD-H:m:s:SSS or compact variants such as YYYYMD-H:m:s:S",
-    "last_normalized_timestamp": "2018-01-03T09:59:00.950000Z",
+    "last_normalized_timestamp": "2018-01-03T09:59:00.095Z",
     "last_timestamp": "201813-9:59:0:95",
     "parseable_timestamps": 253394,
     "timestamp_issue_counts": {

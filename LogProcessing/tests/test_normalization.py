@@ -1,28 +1,43 @@
 import unittest
 
-from LogProcessing.normalization.normalizer import LogNormalizer
+from LogProcessing.normalization.normalizer import LogNormalizer, ParsedTimestamp
 from LogProcessing.parsing.base import ParsedLogRecord
 
 
 class LogNormalizerTests(unittest.TestCase):
     def test_parses_8_digit_timestamp(self):
-        iso_ts, issue = LogNormalizer.parse_timestamp("20171223-22:15:29:606")
-        self.assertIsNone(issue)
-        self.assertEqual(iso_ts, "2017-12-23T22:15:29.606Z")
+        parsed = LogNormalizer.parse_timestamp("20171223-22:15:29:606")
+        self.assertIsNone(parsed.issue)
+        self.assertEqual(parsed.normalized, "2017-12-23T22:15:29.606Z")
 
     def test_parses_6_digit_compact_timestamp(self):
-        iso_ts, issue = LogNormalizer.parse_timestamp("201812-19:39:28:966")
-        self.assertIsNone(issue)
-        self.assertEqual(iso_ts, "2018-01-02T19:39:28.966Z")
+        parsed = LogNormalizer.parse_timestamp("201812-19:39:28:966")
+        self.assertIsNone(parsed.issue)
+        self.assertEqual(parsed.normalized, "2018-01-02T19:39:28.966Z")
 
-        iso_ts2, issue2 = LogNormalizer.parse_timestamp("201813-9:59:0:95")
-        self.assertIsNone(issue2)
-        self.assertEqual(iso_ts2, "2018-01-03T09:59:00.950Z")
+    def test_millisecond_normalization_regression(self):
+        """P0 Regression tests: Non-padded milliseconds must not be right-zero-padded.
+
+        :95 -> .095Z (95 ms, NOT 950 ms)
+        :11 -> .011Z (11 ms, NOT 110 ms)
+        :6  -> .006Z (6 ms, NOT 600 ms)
+        """
+        p95 = LogNormalizer.parse_timestamp("201813-9:59:0:95")
+        self.assertIsNone(p95.issue)
+        self.assertEqual(p95.normalized, "2018-01-03T09:59:00.095Z")
+
+        p11 = LogNormalizer.parse_timestamp("201813-9:59:0:11")
+        self.assertIsNone(p11.issue)
+        self.assertEqual(p11.normalized, "2018-01-03T09:59:00.011Z")
+
+        p6 = LogNormalizer.parse_timestamp("201813-9:59:0:6")
+        self.assertIsNone(p6.issue)
+        self.assertEqual(p6.normalized, "2018-01-03T09:59:00.006Z")
 
     def test_handles_invalid_timestamp_gracefully(self):
-        iso_ts, issue = LogNormalizer.parse_timestamp("invalid-timestamp-value")
-        self.assertIsNone(iso_ts)
-        self.assertEqual(issue, "timestamp_format_mismatch")
+        parsed = LogNormalizer.parse_timestamp("invalid-timestamp-value")
+        self.assertIsNone(parsed.normalized)
+        self.assertEqual(parsed.issue, "timestamp_format_mismatch")
 
     def test_deterministic_event_id(self):
         id1 = LogNormalizer.generate_event_id("HealthApp.log", 42)

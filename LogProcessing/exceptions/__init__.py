@@ -2,6 +2,7 @@
 
 from LogProcessing.exceptions.errors import (
     BlankRecordError,
+    CorruptedRecordError,
     EmptyLogFileError,
     IngestionError,
     InputFileNotFoundError,
@@ -19,6 +20,7 @@ from LogProcessing.exceptions.errors import (
 
 __all__ = [
     "BlankRecordError",
+    "CorruptedRecordError",
     "EmptyLogFileError",
     "IngestionError",
     "InputFileNotFoundError",
