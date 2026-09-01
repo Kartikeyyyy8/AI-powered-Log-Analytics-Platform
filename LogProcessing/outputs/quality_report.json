@@ -5,7 +5,7 @@
   "invalid_records": 1,
   "blank_lines": 0,
   "corrupted_lines": 1,
-  "timestamp_parse_failures": 0,
+  "timestamp_parse_failures": 1,
   "extra_separator_records": 20,
   "component_counts": {
     "Step_LSC": 81216,
@@ -197,8 +197,8 @@
     "message_contains_pipe_separator": 20,
     "contains_null_byte": 1,
     "contains_control_character": 1,
-    "cleaned_null_bytes": 1,
-    "validation_failed": 1
+    "corrupted_timestamp": 1,
+    "parsing_failed": 1
   },
-  "generated_at": "2026-08-30T16:12:56.240790Z"
+  "generated_at": "2026-09-01T08:44:17.158973Z"
 }

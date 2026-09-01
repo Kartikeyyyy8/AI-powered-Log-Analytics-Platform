@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import re
-from typing import Any
 
 from LogProcessing.exceptions.errors import (
     BlankRecordError,
@@ -58,6 +57,15 @@ class HealthAppParser(BaseParser):
             quality_flags.append("message_contains_pipe_separator")
 
         timestamp, component, process_id, message = parts
+        for field_name, field_value in [
+            ("timestamp", timestamp),
+            ("component", component),
+            ("process_id", process_id),
+        ]:
+            if CONTROL_CHARACTER_PATTERN.search(field_value):
+                raise MalformedRecordError(
+                    f"Line {raw_record.line_number} has corrupted {field_name} field."
+                )
 
         # Check for missing/empty required fields
         if not timestamp.replace("\x00", "").strip():

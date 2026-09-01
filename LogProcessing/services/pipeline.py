@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import re
 import sys
 from dataclasses import dataclass
 from datetime import datetime, timezone
@@ -21,6 +22,8 @@ from LogProcessing.storage.dead_letter import DeadLetterWriter
 from LogProcessing.storage.writer import JsonLinesWriter, write_json_report
 from LogProcessing.validation.validator import LogValidator
 
+CONTROL_CHARACTER_PATTERN = re.compile(r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+
 
 @dataclass(frozen=True)
 class ProcessingResult:
@@ -33,6 +36,30 @@ class ProcessingResult:
     total_records: int
     valid_records: int
     invalid_records: int
+
+
+def _raw_quality_flags(raw_message: str) -> list[str]:
+    flags: list[str] = []
+    if not raw_message.replace("\x00", "").strip():
+        flags.append("blank_line")
+    if "\x00" in raw_message:
+        flags.append("contains_null_byte")
+    if "\ufffd" in raw_message:
+        flags.append("decode_replacement_character")
+    if CONTROL_CHARACTER_PATTERN.search(raw_message):
+        flags.append("contains_control_character")
+
+    parts = raw_message.split("|", 3)
+    if len(parts) >= 4:
+        for field_name, field_value in [
+            ("timestamp", parts[0]),
+            ("component", parts[1]),
+            ("process_id", parts[2]),
+        ]:
+            flag = f"corrupted_{field_name}"
+            if CONTROL_CHARACTER_PATTERN.search(field_value) and flag not in flags:
+                flags.append(flag)
+    return flags
 
 
 def process_logs(
@@ -91,7 +118,7 @@ def process_logs(
                     raw_message=raw_record.raw_message,
                     error_reason=f"parsing_failed: {exc}",
                     ingestion_timestamp=raw_record.ingestion_timestamp,
-                    quality_flags=["parsing_failed"],
+                    quality_flags=_raw_quality_flags(raw_record.raw_message) + ["parsing_failed"],
                     metadata={"exception_type": type(exc).__name__},
                 )
                 dead_letter_writer.write(dead_letter)

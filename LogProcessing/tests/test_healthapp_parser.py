@@ -75,12 +75,23 @@ class HealthAppParserTests(unittest.TestCase):
             self.parser.parse(raw4)
 
     def test_flags_null_bytes_and_control_characters(self):
-        msg = "20171223-22:15:29:606|Step_LSC\x07|30002312|msg\x00data"
+        msg = "20171223-22:15:29:606|Step_LSC|30002312|msg\x00data"
         raw = self._make_raw(msg, null_byte=True)
         parsed = self.parser.parse(raw)
 
         self.assertIn("contains_null_byte", parsed.quality_flags)
         self.assertIn("contains_control_character", parsed.quality_flags)
+
+    def test_rejects_corruption_in_structural_fields(self):
+        for msg in [
+            "\x0020171223-22:15:29:606|Step_LSC|30002312|msg",
+            "20171223-22:15:29:606|Step_LSC\x07|30002312|msg",
+            "20171223-22:15:29:606|Step_LSC|3000\x0012|msg",
+        ]:
+            with self.subTest(msg=msg):
+                raw = self._make_raw(msg, null_byte="\x00" in msg)
+                with self.assertRaises(MalformedRecordError):
+                    self.parser.parse(raw)
 
 
 if __name__ == "__main__":

@@ -13,6 +13,7 @@ class DatasetProfilerTests(unittest.TestCase):
             b"tryToReloadTodayBasicSteps1514893168960|0|14696|0\r\n"
             b"\r\n"
             b"\x00\x00bad-line\r\n"
+            b"20171223-22:15:29:606|Step_LSC\x07|30002312|bad component\r\n"
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -21,13 +22,14 @@ class DatasetProfilerTests(unittest.TestCase):
 
             profile = profile_dataset(path)
 
-        self.assertEqual(profile["record_counts"]["total_lines"], 4)
-        self.assertEqual(profile["record_counts"]["valid_format_records"], 2)
+        self.assertEqual(profile["record_counts"]["total_lines"], 5)
+        self.assertEqual(profile["record_counts"]["valid_format_records"], 3)
         self.assertEqual(profile["record_counts"]["extra_separator_records"], 1)
         self.assertEqual(profile["record_counts"]["blank_lines"], 1)
         self.assertEqual(profile["record_counts"]["too_few_field_records"], 1)
         self.assertEqual(profile["record_counts"]["null_byte_lines"], 1)
-        self.assertEqual(profile["timestamps"]["parseable_timestamps"], 2)
+        self.assertEqual(profile["timestamps"]["parseable_timestamps"], 3)
+        self.assertEqual(profile["quality_flags"]["corrupted_component"], 1)
 
 
 if __name__ == "__main__":

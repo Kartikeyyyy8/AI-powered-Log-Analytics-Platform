@@ -165,6 +165,15 @@ def profile_dataset(input_path: str | Path, top_limit: int = 25) -> dict[str, An
                 quality_flags["message_contains_pipe_separator"] += 1
 
             timestamp, component, process_id, message = parts
+            for field_name, field_value in [
+                ("timestamp", timestamp),
+                ("component", component),
+                ("process_id", process_id),
+            ]:
+                if CONTROL_CHARACTER_PATTERN.search(field_value):
+                    line_quality_flags.append(f"corrupted_{field_name}")
+                    quality_flags[f"corrupted_{field_name}"] += 1
+
             if not component.strip():
                 line_quality_flags.append("missing_component")
                 quality_flags["missing_component"] += 1

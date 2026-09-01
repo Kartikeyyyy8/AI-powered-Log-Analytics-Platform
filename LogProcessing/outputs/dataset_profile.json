@@ -4,7 +4,7 @@
     "file_size_bytes": 23529930,
     "file_size_mb": 22.44,
     "path": "/Users/namansehwag/Downloads/HealthApp.log",
-    "profiled_at": "2026-08-30T16:12:57.666446Z"
+    "profiled_at": "2026-09-01T08:44:18.694035Z"
   },
   "format": {
     "expected_shape": "timestamp|component|process_id|message",
@@ -20,6 +20,7 @@
   "quality_flags": {
     "contains_control_character": 1,
     "contains_null_byte": 1,
+    "corrupted_timestamp": 1,
     "message_contains_pipe_separator": 20,
     "timestamp_parse_failed": 1
   },

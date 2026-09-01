@@ -20,6 +20,7 @@ class PipelineTests(unittest.TestCase):
             b"\r\n"
             b"\x00\x00corrupted-record-here\r\n"
             b"20171223-22:15:30:000||30002312|missing component\r\n"
+            b"\x00\x00201813-9:59:0:95|Step_LSC|30002312|looks parseable after stripping\r\n"
         )
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -30,9 +31,9 @@ class PipelineTests(unittest.TestCase):
 
             result = process_logs(input_log, output_dir=out_dir, generate_profile=True)
 
-            self.assertEqual(result.total_records, 5)
+            self.assertEqual(result.total_records, 6)
             self.assertEqual(result.valid_records, 2)
-            self.assertEqual(result.invalid_records, 3)
+            self.assertEqual(result.invalid_records, 4)
 
             # Check processed logs
             self.assertTrue(result.processed_logs_path.exists())
@@ -51,15 +52,24 @@ class PipelineTests(unittest.TestCase):
             # Check dead letter logs
             self.assertTrue(result.dead_letter_logs_path.exists())
             dead_lines = result.dead_letter_logs_path.read_text(encoding="utf-8").strip().split("\n")
-            self.assertEqual(len(dead_lines), 3)
+            self.assertEqual(len(dead_lines), 4)
+            dead_records = [json.loads(line) for line in dead_lines]
+            corrupt_structural = dead_records[-1]
+            self.assertEqual(
+                corrupt_structural["raw_message"],
+                "\x00\x00201813-9:59:0:95|Step_LSC|30002312|looks parseable after stripping",
+            )
+            self.assertIn("contains_null_byte", corrupt_structural["quality_flags"])
+            self.assertIn("corrupted_timestamp", corrupt_structural["quality_flags"])
 
             # Check quality report
             self.assertTrue(result.quality_report_path.exists())
             report = json.loads(result.quality_report_path.read_text(encoding="utf-8"))
-            self.assertEqual(report["total_lines"], 5)
+            self.assertEqual(report["total_lines"], 6)
             self.assertEqual(report["valid_records"], 2)
-            self.assertEqual(report["invalid_records"], 3)
+            self.assertEqual(report["invalid_records"], 4)
             self.assertEqual(report["blank_lines"], 1)
+            self.assertEqual(report["corrupted_lines"], 3)
 
             # Check dataset profile
             self.assertTrue(result.dataset_profile_path.exists())
