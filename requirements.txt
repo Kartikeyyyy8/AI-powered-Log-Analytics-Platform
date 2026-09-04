@@ -1,0 +1,10 @@
+streamlit>=1.40
+pandas>=2.2
+numpy>=1.26
+scikit-learn>=1.5
+plotly>=5.24
+flask>=3.0
+litellm>=1.50
+python-dotenv>=1.0
+pytest>=8.0
+torch>=2.14.0

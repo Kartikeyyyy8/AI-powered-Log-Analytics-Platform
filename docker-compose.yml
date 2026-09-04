@@ -1,0 +1,11 @@
+services:
+  logsense:
+    build: .
+    ports:
+      - "8501:8501"
+    environment:
+      LOG_FILE: data/processed_logs.jsonl
+      GEMINI_API_KEY: ${GEMINI_API_KEY:-}
+      GEMINI_MODEL: ${GEMINI_MODEL:-gemini/gemini-3.6-flash}
+    volumes:
+      - ./data:/app/data
