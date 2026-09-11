@@ -2,6 +2,6 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .coverage
-outputs/*.jsonl
+
 .DS_Store
 */.DS_Store
